@@ -45,31 +45,31 @@ public class dual_ods_test extends OpMode {
             distance_r = ods_r.getValue();
         }
 
-    /*    if(distance_l < 20)
+        if(distance_l < 30)
         {
-            leftMotor.setPower(0.4);
+            leftMotor.setPower(0.2);
         }
-        else if(distance_l > 30)
+        else if(distance_l > 33)
         {
-            leftMotor.setPower(-0.4);
+            leftMotor.setPower(-0.2);
         }
         else
         {
             leftMotor.setPowerFloat();
         }
 
-        if(distance_r < 20)
+        if(distance_r < 30)
         {
-            rightMotor.setPower(0.4);
+            rightMotor.setPower(0.2);
         }
-        else if(distance_r > 30)
+        else if(distance_r > 33)
         {
-            rightMotor.setPower(-0.4);
+            rightMotor.setPower(-0.2);
         }
         else
         {
             rightMotor.setPowerFloat();
-        }*/
+        }
 
 
 

@@ -11,17 +11,17 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 public class Color_Sensor_Calibration extends OpMode {
 
     DeviceInterfaceModule dim;
-    OpticalDistanceSensor leftDistance;
-    OpticalDistanceSensor rightDistance;
-    double reflectanceLeft = leftDistance.getLightDetected();
-    double reflectanceRight = rightDistance.getLightDetected();
+   // OpticalDistanceSensor leftDistance;
+    //OpticalDistanceSensor rightDistance;
+    //double reflectanceLeft = leftDistance.getLightDetected();
+    //double reflectanceRight = rightDistance.getLightDetected();
     ColorSensor colorRGB;
 
     @Override
     public void init() {
         dim = hardwareMap.deviceInterfaceModule.get("device");
-        leftDistance = hardwareMap.opticalDistanceSensor.get("odslf");
-        rightDistance = hardwareMap.opticalDistanceSensor.get("odsrf");
+        //leftDistance = hardwareMap.opticalDistanceSensor.get("odslf");
+        //rightDistance = hardwareMap.opticalDistanceSensor.get("odsrf");
         colorRGB = hardwareMap.colorSensor.get("color");
 
     }
@@ -32,8 +32,8 @@ public class Color_Sensor_Calibration extends OpMode {
         int Blue = colorRGB.blue();
         int Green = colorRGB.green();
 
-        telemetry.addData("LeftDistance", reflectanceLeft);
-        telemetry.addData("RightDistance", reflectanceRight);
+        //telemetry.addData("LeftDistance", reflectanceLeft);
+        //telemetry.addData("RightDistance", reflectanceRight);
         telemetry.addData("Red", Red);
         telemetry.addData("Blue", Blue);
         telemetry.addData("Green", Green);

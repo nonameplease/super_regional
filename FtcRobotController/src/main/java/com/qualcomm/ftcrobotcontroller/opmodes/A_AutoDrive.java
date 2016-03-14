@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by Scott on 1/31/2016.
+ * Encoder Drive 3 works
+ * Encoder Drive 2 drive motors in sequence
  */
 public class A_AutoDrive extends A_RobotDrive {
 
@@ -59,8 +61,9 @@ public class A_AutoDrive extends A_RobotDrive {
         return COUNTSINT;
     }
 
-    public void encoderDrive(int COUNTSINT, double leftpower, double rightpower, double leftcount, double rightcount)
+    public void encoderDrive(int inches, double leftpower, double rightpower, double leftcount, double rightcount)
     {
+        int COUNTSINT = getTargetCounts(inches);
         if(leftpower > 0) {
             leftMotor.setTargetPosition(COUNTSINT + (int)leftcount);
         }
@@ -69,16 +72,131 @@ public class A_AutoDrive extends A_RobotDrive {
         }
 
         if(rightpower > 0){
-            rightMotor.setTargetPosition(COUNTSINT + (int)rightcount);
+            rightMotor.setTargetPosition(COUNTSINT + (int) rightcount);
         }
         else if(rightpower < 0){
-            rightMotor.setTargetPosition(-COUNTSINT + (int)rightcount);
+            rightMotor.setTargetPosition(-COUNTSINT + (int) rightcount);
         }
         leftMotor.setPower(leftpower);
-
         rightMotor.setPower(rightpower);
         leftcount = leftMotor.getCurrentPosition();
         rightcount = rightMotor.getCurrentPosition();
+    }
+
+    public void encoderDrive2(int inches, double leftpower, double rightpower, int leftcount, int rightcount)
+    {
+        int COUNTSINT = getTargetCounts(inches);
+        int multiplierLeft = 1;
+        int multiplierRight = 1;
+        if(leftpower < 0) {
+            multiplierLeft = -1;
+        }
+
+        if(rightpower < 0){
+            multiplierRight = -1;
+        }
+
+        int leftTargetPosition = multiplierLeft * COUNTSINT + leftcount;
+        int rightTargetPosition = multiplierRight * COUNTSINT + rightcount;
+
+        if(leftpower > 0){
+            while(leftTargetPosition > leftMotor.getCurrentPosition()){
+                leftMotor.setPower(leftpower);
+                if(leftTargetPosition < leftMotor.getCurrentPosition()) {
+                    break;
+                }
+            }
+            leftMotor.setPower(0);
+        }
+        else if(leftpower < 0){
+            while(leftTargetPosition < leftMotor.getCurrentPosition()){
+                leftMotor.setPower(leftpower);
+                if(leftTargetPosition > leftMotor.getCurrentPosition()){
+                    break;
+                }
+            }
+            leftMotor.setPower(0);
+        }
+
+        if(rightpower > 0){
+            while(rightTargetPosition > rightMotor.getCurrentPosition()){
+                rightMotor.setPower(rightpower);
+                if(rightTargetPosition < rightMotor.getCurrentPosition()){
+                    break;
+                }
+            }
+            rightMotor.setPower(0);
+        }
+        else if(rightpower < 0){
+            while(rightTargetPosition < rightMotor.getCurrentPosition()){
+                rightMotor.setPower(rightpower);
+                if(rightTargetPosition > rightMotor.getCurrentPosition()){
+                    break;
+                }
+            }
+            rightMotor.setPower(0);
+        }
+    }
+
+    public void encoderDrive3(int inches, double leftpower, double rightpower, int leftcount, int rightcount)
+    {
+        int COUNTSINT = getTargetCounts(inches);
+        int multiplierLeft = 1;
+        int multiplierRight = 1;
+        if(leftpower < 0) {
+            multiplierLeft = -1;
+        }
+
+        if(rightpower < 0){
+            multiplierRight = -1;
+        }
+
+        int leftTargetPosition = multiplierLeft * COUNTSINT + leftcount;
+        int rightTargetPosition = multiplierRight * COUNTSINT + rightcount;
+
+        char statel = 'n';
+        char stater = 'n';
+
+        do {
+            if (leftpower > 0) {
+                if (leftTargetPosition > leftMotor.getCurrentPosition()) {
+                    leftMotor.setPower(leftpower);
+                    statel = 'y';
+                } else {
+                    leftMotor.setPower(0);
+                    statel = 'n';
+                }
+            } else if (leftpower < 0) {
+                if (leftTargetPosition < leftMotor.getCurrentPosition()) {
+                    leftMotor.setPower(leftpower);
+                    statel = 'y';
+                } else {
+                    leftMotor.setPower(0);
+                    statel = 'n';
+                }
+            }
+
+            if (rightpower > 0) {
+                if (rightTargetPosition > rightMotor.getCurrentPosition()) {
+                    rightMotor.setPower(rightpower);
+                    stater = 'y';
+                } else {
+                    rightMotor.setPower(0);
+                    stater = 'n';
+                }
+            } else if (rightpower < 0) {
+                if (rightTargetPosition < rightMotor.getCurrentPosition()) {
+                    rightMotor.setPower(rightpower);
+                    stater = 'y';
+                } else {
+                    rightMotor.setPower(0);
+                    stater = 'n';
+                }
+            }
+        }
+        while(statel == 'y' && stater == 'y');
+        leftMotor.setPowerFloat();
+        rightMotor.setPowerFloat();
     }
 
     public void encoderDriveUsingPosition(int COUNTSINT, double power) {
@@ -241,6 +359,30 @@ public class A_AutoDrive extends A_RobotDrive {
         {
             rightMotor.setPowerFloat();
         }
+    }
+
+    public void find_line(String color){
+        //1 grey
+        //2 whilte
+        //3 red
+
+        int colorDesired = 0;
+
+        if(color == "grey"){
+            colorDesired = 1;
+        }
+        else if(color == "white"){
+            colorDesired = 2;
+        }
+        else if(color == "red"){
+            colorDesired = 3;
+        }
+
+        do{
+            leftMotor.setPower(0.2);
+            rightMotor.setPower(0.2);
+        }
+        while(colorDetected() != colorDesired);
     }
 
 

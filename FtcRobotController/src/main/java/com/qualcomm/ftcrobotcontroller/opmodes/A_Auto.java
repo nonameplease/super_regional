@@ -1,6 +1,7 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
  * Created by Scott on 2/4/2016.
@@ -27,15 +28,26 @@ public class A_Auto extends LinearOpMode {
                                         hardwareMap.analogInput.get("odsl"),
                                         hardwareMap.analogInput.get("odsr"));
 
+        myA_AutoDrive.rightMotor.setDirection(DcMotor.Direction.REVERSE);
+
         waitForStart();
 
         while(opModeIsActive()) {
            // myA_AutoDrive.encoderDriveUsingPosition(myA_AutoDrive.getTargetCounts(120), 0.2);
             myA_AutoDrive.leftMotor.setPower(1);
             myA_AutoDrive.rightMotor.setPower(1);
-            wait(500);
+            sleep(500);
             myA_AutoDrive.leftMotor.setPowerFloat();
             myA_AutoDrive.rightMotor.setPowerFloat();
+
+            do{
+                myA_AutoDrive.leftMotor.setPower(0.3);
+                myA_AutoDrive.rightMotor.setPower(0.3);
+                sleep(100);
+                myA_AutoDrive.leftMotor.setPower(0);
+                myA_AutoDrive.rightMotor.setPower(0);
+            }
+            while(myA_AutoDrive.colorDetected() != 2);
 
 
            /* do

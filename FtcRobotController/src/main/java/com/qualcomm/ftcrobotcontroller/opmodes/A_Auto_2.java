@@ -33,9 +33,20 @@ public class A_Auto_2 extends OpMode {
     }
 
     @Override
+    public void start()
+    {
+        myA_AutoDrive.leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        myA_AutoDrive.rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        myA_AutoDrive.leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        myA_AutoDrive.rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+    }
+
+    @Override
     public void loop()
     {
-        int a = 0;
+
+        myA_AutoDrive.encoderDrive2(50, 0.3, 0.3, 0, 0);
+        /*int a = 0;
         int white = 2;
         if (myA_AutoDrive.colorDetected() == white)
         {
@@ -51,7 +62,7 @@ public class A_Auto_2 extends OpMode {
                 myA_AutoDrive.leftMotor.setPowerFloat();
                 myA_AutoDrive.rightMotor.setPowerFloat();
             }
-        }
+        }*/
 
        /* if(a == 0)
         {
@@ -80,6 +91,5 @@ public class A_Auto_2 extends OpMode {
         telemetry.addData("color", myA_AutoDrive.colorDetected());
         telemetry.addData("leftpower", myA_AutoDrive.leftMotor.getPower());
         telemetry.addData("rightpower", myA_AutoDrive.rightMotor.getPower());
-        telemetry.addData("state", a);
     }
 }
