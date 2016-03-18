@@ -57,19 +57,16 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("odstest", dual_ods_test.class);
     manager.register("A_Tele", A_Tele.class);
     manager.register("Auto3", A_Auto_3.class);
-    manager.register("Auto2", A_Auto_2.class);
-    manager.register("Auto1", A_Auto.class);
+    //manager.register("Auto2", A_Auto_2.class);
+    //manager.register("Auto1", A_Auto.class);
     manager.register("Encodertest2", encoder_test_2.class);
     manager.register("findline_test", A_findline_test.class);
-    manager.register("ColorSensorCalibration", Color_Sensor_Calibration.class);
+    //manager.register("ColorSensorCalibration", Color_Sensor_Calibration.class);
     manager.register("colortest", colortestauto.class);
-
-
-
-    /*
-     * Uncomment any of the following lines if you want to register an op mode.
-     */
-    manager.register("MR Gyro Test", MRGyroTest.class);
+    //manager.register("sensor test", sensortest.class);
+    manager.register("odsdrive_linear", odsdrivetodistance_linear.class);
+    manager.register("Auto_Left", A_Auto_Left.class);
+    manager.register("Auto_Right", A_Auto_Right.class);
 
     //manager.register("AdafruitRGBExample", AdafruitRGBExample.class);
     //manager.register("ColorSensorDriver", ColorSensorDriver.class);

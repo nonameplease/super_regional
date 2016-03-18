@@ -12,21 +12,19 @@ import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 public class dual_ods_test extends OpMode {
 
     DeviceInterfaceModule dim;
-    AnalogInput ods_l;
-    AnalogInput ods_r;
+    OpticalDistanceSensor ods_l;
+    OpticalDistanceSensor ods_r;
 
 
 
     DcMotor leftMotor;
     DcMotor rightMotor;
-    DcMotor leftMotorRear;
-    DcMotor rightMotorRear;
 
     @Override
     public void init() {
         dim = hardwareMap.deviceInterfaceModule.get("device");
-        ods_l = hardwareMap.analogInput.get("odsl");
-        ods_r = hardwareMap.analogInput.get("odsr");
+        ods_l = hardwareMap.opticalDistanceSensor.get("odsl");
+        ods_r = hardwareMap.opticalDistanceSensor.get("odsr");
         leftMotor = hardwareMap.dcMotor.get("left_drive");
         rightMotor = hardwareMap.dcMotor.get("right_drive");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -35,45 +33,34 @@ public class dual_ods_test extends OpMode {
 
     @Override
     public void loop() {
-        double distance_l = 0.0;
-        double distance_r = 0.0;
-        if(ods_l.getValue() < 300) {
-            distance_l = ods_l.getValue();
-        }
+        double distance_l = ods_l.getLightDetected();
+        double distance_r = ods_r.getLightDetected();
 
-        if(ods_r.getValue() < 300) {
-            distance_r = ods_r.getValue();
-        }
-
-        if(distance_l < 30)
-        {
-            leftMotor.setPower(0.2);
-        }
-        else if(distance_l > 33)
+        if(distance_l < 0.25)
         {
             leftMotor.setPower(-0.2);
         }
+        else if(distance_l > 0.3 )
+        {
+            leftMotor.setPower(0.2);
+        }
         else
         {
-            leftMotor.setPowerFloat();
+            leftMotor.setPower(0);
         }
 
-        if(distance_r < 30)
-        {
-            rightMotor.setPower(0.2);
-        }
-        else if(distance_r > 33)
+        if(distance_r < 0.25)
         {
             rightMotor.setPower(-0.2);
         }
+        else if(distance_r > 0.3)
+        {
+            rightMotor.setPower(0.2 );
+        }
         else
         {
-            rightMotor.setPowerFloat();
+            rightMotor.setPower(0);
         }
-
-
-
-
 
         telemetry.addData("Distance Detected Left", distance_l);
         telemetry.addData("Distance Detected Right", distance_r);

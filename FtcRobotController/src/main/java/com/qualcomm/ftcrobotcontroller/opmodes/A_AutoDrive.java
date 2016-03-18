@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
@@ -14,12 +15,13 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Encoder Drive 3 works
  * Encoder Drive 2 drive motors in sequence
  */
-public class A_AutoDrive extends A_RobotDrive {
+public class  A_AutoDrive extends A_RobotDrive {
 
     DeviceInterfaceModule dim;
     ColorSensor color;
-    AnalogInput ods_l;
-    AnalogInput ods_r;
+    AnalogInput ultrasonic;
+    OpticalDistanceSensor ods_l;
+    OpticalDistanceSensor ods_r;
 
     /*change the value if necessary LOL
     final static int ENCODER_CPR = 1120;
@@ -36,13 +38,14 @@ public class A_AutoDrive extends A_RobotDrive {
     public A_AutoDrive(DcMotor left, DcMotor right, DcMotor leftrotate, DcMotor rightrotate,
                        DcMotor Climber, Servo Lifter, Servo clawr, Servo clawl,
                        Servo ResQr, Servo ResQl, DeviceInterfaceModule Dim,
-                       ColorSensor Color, AnalogInput ODSL, AnalogInput ODSR) {
+                       ColorSensor Color, OpticalDistanceSensor ODSL, OpticalDistanceSensor ODSR, AnalogInput Ultra) {
         super(left, right, leftrotate, rightrotate, Climber,
                 Lifter, clawr, clawl, ResQr, ResQl);
         dim = Dim;
         color = Color;
         ods_l = ODSL;
         ods_r = ODSR;
+        ultrasonic = Ultra;
         leftMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         rightMotor.setMode(DcMotorController.RunMode.RESET_ENCODERS);
     }
@@ -59,28 +62,6 @@ public class A_AutoDrive extends A_RobotDrive {
         double COUNTS = ENCODER_CPR * ROTATIONS * GEAR_RATIO;
         int COUNTSINT = (int) COUNTS;
         return COUNTSINT;
-    }
-
-    public void encoderDrive(int inches, double leftpower, double rightpower, double leftcount, double rightcount)
-    {
-        int COUNTSINT = getTargetCounts(inches);
-        if(leftpower > 0) {
-            leftMotor.setTargetPosition(COUNTSINT + (int)leftcount);
-        }
-        else if(leftpower < 0) {
-            leftMotor.setTargetPosition(-COUNTSINT + (int)leftcount);
-        }
-
-        if(rightpower > 0){
-            rightMotor.setTargetPosition(COUNTSINT + (int) rightcount);
-        }
-        else if(rightpower < 0){
-            rightMotor.setTargetPosition(-COUNTSINT + (int) rightcount);
-        }
-        leftMotor.setPower(leftpower);
-        rightMotor.setPower(rightpower);
-        leftcount = leftMotor.getCurrentPosition();
-        rightcount = rightMotor.getCurrentPosition();
     }
 
     public void encoderDrive2(int inches, double leftpower, double rightpower, int leftcount, int rightcount)
@@ -193,34 +174,13 @@ public class A_AutoDrive extends A_RobotDrive {
                     stater = 'n';
                 }
             }
+
         }
         while(statel == 'y' && stater == 'y');
         leftMotor.setPowerFloat();
         rightMotor.setPowerFloat();
     }
 
-    public void encoderDriveUsingPosition(int COUNTSINT, double power) {
-        leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-
-        if(COUNTSINT > Math.abs(leftMotor.getCurrentPosition()))
-        {
-            leftMotor.setPower(-power);
-        }
-        else
-        {
-            leftMotor.setPowerFloat();
-        }
-
-        if(COUNTSINT > Math.abs(rightMotor.getCurrentPosition()))
-        {
-            rightMotor.setPower(-power);
-        }
-        else
-        {
-            rightMotor.setPowerFloat();
-        }
-    }
 
     public void encoderReset()
     {
@@ -323,68 +283,174 @@ public class A_AutoDrive extends A_RobotDrive {
 
     public double distance_l()
     {
-        double distance_l = ods_l.getValue();
+        double distance_l = ods_l.getLightDetected();
         return distance_l;
     }
     public double distance_r()
     {
-        double distance_r = ods_r.getValue();
+        double distance_r = ods_r.getLightDetected();
         return distance_r;
     }
 
-    public void odsDriveToDistance()
-    {
-        if(distance_l() < 300)
-        {
-            leftMotor.setPower(-0.4);
-        }
-        else if(distance_l() > 350)
-        {
-            leftMotor.setPower(0.4);
-        }
-        else
-        {
-            leftMotor.setPowerFloat();
-        }
 
-        if(distance_r() < 300)
-        {
-            rightMotor.setPower(-0.4);
+    public void odsDriveToDistance(int stop_distance, A_Auto_Right autoright) throws InterruptedException
+    {
+        char state_l = 'n';
+        char state_r = 'n';
+        int current_distance = 0;
+
+        do {
+            if (distance_l() < 0.25) {
+                leftMotor.setPower(-0.2);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'y';
+            } else if (distance_l() > 0.3) {
+                leftMotor.setPower(0.2);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'y';
+            } else {
+                leftMotor.setPower(0);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'n';
+            }
+
+            if (distance_r() < 0.25) {
+                rightMotor.setPower(-0.2);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'y';
+            } else if (distance_r() > 0.3) {
+                rightMotor.setPower(0.2);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'y';
+            } else {
+                rightMotor.setPower(0);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'n';
+            }
+
+            autoright.waitOneFullHardwareCycle();
+
         }
-        else if(distance_r() > 350)
-        {
-            rightMotor.setPower(0.4);
-        }
-        else
-        {
-            rightMotor.setPowerFloat();
-        }
+        while((state_l == 'y' || state_r == 'y'));
+        leftMotor.setPowerFloat();
+        rightMotor.setPowerFloat();
     }
 
-    public void find_line(String color){
+    public void find_line(String color, A_Auto_Right autoright) throws InterruptedException{
         //1 grey
         //2 whilte
         //3 red
 
+        char state = 'n';
         int colorDesired = 0;
 
-        if(color == "grey"){
+        if(color.equals("grey")){
             colorDesired = 1;
         }
-        else if(color == "white"){
+        else if(color.equals("white")){
             colorDesired = 2;
         }
-        else if(color == "red"){
+        else if(color.equals("red")){
             colorDesired = 3;
         }
 
+
         do{
-            leftMotor.setPower(0.2);
-            rightMotor.setPower(0.2);
+            if(colorDetected() != colorDesired) {
+                leftMotor.setPower(-0.2);
+                rightMotor.setPower(-0.2);
+                state = 'y';
+            }
+            else if(colorDetected() == colorDesired){
+                leftMotor.setPower(0);
+                rightMotor.setPower(0);
+                state = 'n';
+            }
+            autoright.waitOneFullHardwareCycle();
         }
-        while(colorDetected() != colorDesired);
+        while(state == 'y');
+        leftMotor.setPowerFloat();
+        rightMotor.setPowerFloat();
     }
 
+    public void odsDriveToDistance(int stop_distance, A_Auto_Left autoleft) throws InterruptedException
+    {
+        char state_l = 'n';
+        char state_r = 'n';
+        int current_distance = 0;
 
+        do {
+            if (distance_l() < 0.25) {
+                leftMotor.setPower(-0.2);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'y';
+            } else if (distance_l() > 0.3) {
+                leftMotor.setPower(0.2);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'y';
+            } else {
+                leftMotor.setPower(0);
+                current_distance = Math.abs(leftMotor.getCurrentPosition());
+                state_l = 'n';
+            }
+
+            if (distance_r() < 0.25) {
+                rightMotor.setPower(-0.2);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'y';
+            } else if (distance_r() > 0.3) {
+                rightMotor.setPower(0.2);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'y';
+            } else {
+                rightMotor.setPower(0);
+                current_distance = Math.abs(rightMotor.getCurrentPosition());
+                state_r = 'n';
+            }
+
+            autoleft.waitOneFullHardwareCycle();
+
+        }
+        while((state_l == 'y' || state_r == 'y'));
+        leftMotor.setPowerFloat();
+        rightMotor.setPowerFloat();
+    }
+
+    public void find_line(String color, A_Auto_Left autoleft) throws InterruptedException{
+        //1 grey
+        //2 whilte
+        //3 red
+
+        char state = 'n';
+        int colorDesired = 0;
+
+        if(color.equals("grey")){
+            colorDesired = 1;
+        }
+        else if(color.equals("white")){
+            colorDesired = 2;
+        }
+        else if(color.equals("red")){
+            colorDesired = 3;
+        }
+
+
+        do{
+            if(colorDetected() != colorDesired) {
+                leftMotor.setPower(-0.2);
+                rightMotor.setPower(-0.2);
+                state = 'y';
+            }
+            else if(colorDetected() == colorDesired){
+                leftMotor.setPower(0);
+                rightMotor.setPower(0);
+                state = 'n';
+            }
+            autoleft.waitOneFullHardwareCycle();
+        }
+        while(state == 'y');
+        leftMotor.setPowerFloat();
+        rightMotor.setPowerFloat();
+    }
 
 }

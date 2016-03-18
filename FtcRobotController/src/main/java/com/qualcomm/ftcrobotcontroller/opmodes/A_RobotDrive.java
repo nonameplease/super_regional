@@ -1,5 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -195,28 +196,39 @@ public class A_RobotDrive {
         resQ(gamepad2.y,gamepad2.a);
     }
 
-    public void claw(boolean gamepad1y, boolean gamepad1a)
+    public void claw(boolean gamepad1y, boolean gamepad1a, boolean gamepad1up, boolean gamepad1down)
     {
         if(gamepad1y)
         {
-            claw_l.setPosition(0.6);
+            //claw_l.setPosition(0.6);
             claw_r.setPosition(0.4);
         }
         else if(gamepad1a)
         {
-            claw_l.setPosition(0.4);
+            //claw_l.setPosition(0.4);
             claw_r.setPosition(0.6);
         }
         else
         {
-            claw_l.setPosition(0.5);
+            //claw_l.setPosition(0.5);
             claw_r.setPosition(0.5);
         }
+
+        if(gamepad1up){
+            claw_l.setPosition(0.6);
+        }
+        else if(gamepad1down){
+            claw_l.setPosition(0.4);
+        }
+        else{
+            claw_l.setPosition(0.5);
+        }
+
     }
 
     public void claw(Gamepad gamepad1)
     {
-        claw(gamepad1.y, gamepad1.a);
+        claw(gamepad1.y, gamepad1.a, gamepad1.dpad_up, gamepad1.dpad_down);
     }
 
     public void lifter(boolean gamepad2dpadup, boolean gamepad2dpaddown)

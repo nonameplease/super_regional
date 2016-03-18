@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorController;
 /**
  * Created by Scott on 2/6/2016.
  */
-public class A_Auto_3 extends LinearOpMode {
+public class A_Auto_Right extends LinearOpMode {
     A_AutoDrive myA_AutoDrive;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,7 +36,6 @@ public class A_Auto_3 extends LinearOpMode {
 
         waitForStart();
 
-
         myA_AutoDrive.leftMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         myA_AutoDrive.rightMotor.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
@@ -64,10 +63,10 @@ public class A_Auto_3 extends LinearOpMode {
                 count[1] = myA_AutoDrive.rightMotor.getCurrentPosition();
                 sleep(300);
                 a = "start finding line";
-               // myA_AutoDrive.find_line("white", this);
+                myA_AutoDrive.find_line("white", this);
                 sleep(300);
                 a = "start finding wall";
-               // myA_AutoDrive.odsDriveToDistance(ods_failsafe, this);
+                myA_AutoDrive.odsDriveToDistance(ods_failsafe, this);
                 a = "program finished";
 
                 flag++;
@@ -82,7 +81,7 @@ public class A_Auto_3 extends LinearOpMode {
 
                 flag++;
             }*/
-
+            telemetry.addData("This program needs to calibrate encoder, color sensor, and climbers", null);
             telemetry.addData("Status: ", a);
             telemetry.addData("left encoder", myA_AutoDrive.leftMotor.getCurrentPosition());
             telemetry.addData("right encoder", myA_AutoDrive.rightMotor.getCurrentPosition());
